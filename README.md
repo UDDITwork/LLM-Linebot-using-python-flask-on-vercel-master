@@ -1,5 +1,5 @@
 # LLM-Linebot-using-python-flask-on-vercel-master# ChatGPT Line Bot Implementation
-# Author: [Your Name]
+# Author: [Uddit;udditalerts247@gmail.com]
 # Description: A Line messaging bot powered by ChatGPT API
 # Last Updated: 2024
 
