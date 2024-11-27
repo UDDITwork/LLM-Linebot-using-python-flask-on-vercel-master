@@ -1,57 +1,65 @@
 import os
 
-# Define default language and message limit from environment variables
-chat_language = os.getenv("INIT_LANGUAGE", default="en")  # Changed default to English
-MSG_LIST_LIMIT = int(os.getenv("MSG_LIST_LIMIT", default=7))
+# Default settings from environment variables
+initial_language = os.getenv("INIT_LANGUAGE", default="en")
+message_history_limit = int(os.getenv("MSG_LIST_LIMIT", default=7))
 
-# Multilingual greeting messages
-LANGUAGE_TABLE = {
-    "zh": "哈囉！",  # Chinese greeting
-    "en": "Hello!"   # English greeting
+# Available greetings in different languages
+available_greetings = {
+    "en": "Hello!",
+    "fr": "Bonjour!",
+    "es": "¡Hola!",
+    "de": "Hallo!"
 }
 
-# AI teaching assistant guidelines
-AI_GUIDELINES = '''You are an AI teaching assistant who uses the Socratic method to 
-provide initial responses instead of direct answers. You will remind students to 
-consult their teachers when necessary.'''
+# Teaching assistant behavior guidelines
+teaching_guidelines = '''
+You are an AI teaching assistant implementing the Socratic method of instruction.
+Your role is to guide students through questioning rather than providing direct answers.
+When necessary, remind students to verify important concepts with their teachers.
+Encourage critical thinking and self-discovery in the learning process.
+'''
 
-class Prompt:
+class ConversationManager:
     """
-    A class to manage conversation history and generate prompts for the AI teaching assistant.
-    This implements a message queue with a fixed size limit to maintain context while
-    preventing the conversation history from growing too large.
+    Manages the conversation flow between users and the AI teaching assistant.
+    Maintains a limited message history and structures the conversation format.
     """
     
     def __init__(self):
         """
-        Initialize the prompt manager with a system message that sets up the AI's
-        role and greeting in the specified language.
+        Initializes the conversation manager with a system-level greeting
+        and teaching guidelines in the specified language.
         """
-        self.msg_list = []
-        self.msg_list.append({
+        self.message_history = []
+        self.message_history.append({
             "role": "system",
-            "content": f"{LANGUAGE_TABLE[chat_language]}, {AI_GUIDELINES}"
+            "content": f"{available_greetings[initial_language]}, {teaching_guidelines}"
         })
 
-    def add_msg(self, new_msg):
+    def add_message(self, incoming_message):
         """
-        Add a new message to the conversation history, maintaining the size limit.
-        If the list reaches its limit, the oldest message (except the system prompt)
-        is removed before adding the new one.
-        
-        Args:
-            new_msg (str): The new message to be added to the conversation history
-        """
-        if len(self.msg_list) >= MSG_LIST_LIMIT:
-            self.msg_list.pop(0)  # Remove oldest message when limit is reached
-        self.msg_list.append({"role": "user", "content": new_msg})
+        Adds a new message to the conversation history while maintaining
+        the specified message limit.
 
-    def generate_prompt(self):
+        Args:
+            incoming_message (str): The new message to be added to the conversation
         """
-        Return the current conversation history including the system prompt
-        and all user messages.
+        if len(self.message_history) >= message_history_limit:
+            # Remove oldest message when limit is reached, preserving system message
+            self.message_history.pop(0)
         
-        Returns:
-            list: The complete list of messages in the conversation history
+        self.message_history.append({
+            "role": "user",
+            "content": incoming_message
+        })
+
+    def get_conversation_history(self):
         """
-        return self.msg_list
+        Retrieves the current conversation history including system prompt
+        and user messages.
+
+        Returns:
+            list: Complete conversation history in chronological order
+        """
+        return self.message_history
